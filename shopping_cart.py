@@ -1,15 +1,22 @@
 from decimal import Decimal
-from typing import Dict
+from typing import Dict, List
 from products_storage import ProductsStorage
 
 
-class PromoCodeChecker:
+# class PromoCodeChecker:
 
-    def __init__(self, promocodes: Dict[str, str]) -> None:
-        self.available_promocodes = {k.upper(): v for k, v in promocodes.items()}
+#     def __init__(self, promocodes: Dict[str, str]) -> None:
+#         self.available_promocodes = {k.upper(): v for k, v in promocodes.items()}
 
-    def check_promo_code(self, promo_code: str) -> Decimal:
-        return Decimal(self.available_promocodes.get(promo_code, "0"))
+#     def check_promo_code(self, promo_code: str) -> Decimal:
+#         return Decimal(self.available_promocodes.get(promo_code, "0"))
+
+
+class PromoCode:
+    def __init__(self, code: str, discount: Decimal, threshold: Decimal) -> None:
+        self.code = code
+        self.discount = discount
+        self.threshold = threshold
 
 
 class ShoppingCartItem:
@@ -38,12 +45,14 @@ class ShoppingCartItem:
 class ShoppingCart:
 
     def __init__(
-        self, region: str, products: ProductsStorage, promocodes: PromoCodeChecker
+        self, region: str, products: ProductsStorage, promocodes: List[PromoCode]
     ) -> None:
         self.region_code = region
         self.products = products
-        self.promo_codes = promocodes
+        self.promocodes = {p.code.upper(): p for p in promocodes}
         self._items: Dict[str, ShoppingCartItem] = {}
+
+        self.promocode_discount = Decimal("0")
 
     def total_items(self) -> int:
         return len(self._items)
@@ -61,10 +70,24 @@ class ShoppingCart:
 
         self._items[sku] = sci
 
-    def get_total(self, promo_code: str = None):
+    @property
+    def gross_total(self):
+        return sum([item.total for item in self._items.values()]) 
 
-        promo_discount = self.promo_codes.check_promo_code(promo_code) if promo_code else Decimal("0")
 
-        total = sum([item.total for item in self._items.values()]) * (Decimal(1) - promo_discount)
+    def apply_promocode(self, promo_code: str) -> bool:        
+        upper_promocode = promo_code.upper()
 
-        return total
+        if upper_promocode in self.promocodes:
+            if self.gross_total > self.promocodes[upper_promocode].threshold:
+                self.promocode_discount = self.promocodes[upper_promocode].discount
+                return True
+            else:
+                return False
+        else:
+            raise Exception("Promo code not found.")    
+                
+
+    def get_total(self):
+        return self.gross_total - self.promocode_discount
+        

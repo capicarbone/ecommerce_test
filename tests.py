@@ -2,7 +2,7 @@ from decimal import Decimal
 import unittest
 
 from products_storage import ProductsStorage
-from shopping_cart import PromoCodeChecker, ShoppingCart, ShoppingCartItem
+from shopping_cart import PromoCode, ShoppingCart, ShoppingCartItem
 from utils import create_fake_products_storage
 
 
@@ -94,9 +94,9 @@ class ShoppingCartTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         self.products = create_fake_products_storage()
-        self.promocodes = PromoCodeChecker({
-            "GAMER": "0.1"
-        })
+        self.promocodes = [
+            PromoCode("promo1", Decimal("10"), Decimal("100"))
+        ]
 
     def test_add_item(self):
 
@@ -123,7 +123,8 @@ class ShoppingCartTestCase(unittest.TestCase):
         sc.add_item("xbox", 2)
 
         self.assertEqual(Decimal("2900.00"), sc.get_total())
-        self.assertEqual(Decimal("2610.00"), sc.get_total(promo_code="GAMER"))
+        self.assertTrue(sc.apply_promocode('promo1'))        
+        self.assertEqual(Decimal("2890.00"), sc.get_total())
 
     def test_get_total_with_items_with_discount(self):
 
@@ -133,4 +134,20 @@ class ShoppingCartTestCase(unittest.TestCase):
         sc.add_item("xbox", 2)
 
         self.assertEqual(Decimal("2365.00"), sc.get_total())
-        self.assertEqual(Decimal("2128.50"), sc.get_total(promo_code="GAMER"))
+        self.assertTrue(sc.apply_promocode('promo1'))
+        self.assertEqual(Decimal("2355.00"), sc.get_total())
+
+    def test_not_existing_promocode(self):
+        sc = ShoppingCart("es", self.products, self.promocodes)
+
+        sc.add_item("ps4", 2)
+
+        with self.assertRaises(Exception) as ctx:
+            sc.apply_promocode("invalid")
+
+        self.assertTrue("Promo code not found" in str(ctx.exception))
+
+    
+
+        
+
