@@ -2,6 +2,23 @@ from decimal import Decimal
 from typing import Dict, List
 
 
+class DiscountByVolume:
+
+    def __init__(
+        self, qty_threshold: int, percentage_discount: Decimal, amount_discount: Decimal
+    ) -> None:
+        
+        if not percentage_discount and not amount_discount:
+            raise Exception("Either percentage_discount or amount_discount are required.")
+        
+        if qty_threshold < 1:
+            raise Exception("Invalid threshold")
+
+        self.qty_threshold = qty_threshold
+        self.percentage_discount = percentage_discount
+        self.amount_discount = amount_discount
+
+
 class ProductRegion:
 
     def __init__(
@@ -25,9 +42,13 @@ class Product:
         self.sku: str = sku
         self.description: str = description
         self.regions: Dict[str, ProductRegion] = {}
+        self.discounts_by_volume: List[DiscountByVolume] = []
 
     def add_region(self, region: ProductRegion) -> None:
         self.regions[region.region_code] = region
+
+    def add_discount_by_volume(self, discount: DiscountByVolume) -> None:
+        self.discounts_by_volume.append(discount)
 
     def __str__(self) -> str:
         return f"({self.sku}) {self.description}"
@@ -51,6 +72,22 @@ class ProductsStorage:
         product = self._products[sku]
 
         product.add_region(ProductRegion(region_code, price, discount))
+
+    def add_discount_by_volume_to_product(
+        self,
+        sku: str,
+        threshold: int,
+        amount_discount: Decimal = None,
+        percentage_discount: Decimal = None,
+    ):        
+        product = self._products[sku]
+        product.add_discount_by_volume(
+            DiscountByVolume(
+                qty_threshold=threshold,
+                percentage_discount=percentage_discount,
+                amount_discount=amount_discount,
+            )
+        )
 
     def get_product(self, sku):
         return self._products[sku]

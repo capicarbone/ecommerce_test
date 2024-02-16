@@ -45,11 +45,11 @@ class ShoppingCartItem:
 class ShoppingCart:
 
     def __init__(
-        self, region: str, products: ProductsStorage, promocodes: List[PromoCode]
+        self, region: str, products: ProductsStorage, available_promocodes: List[PromoCode]
     ) -> None:
         self.region_code = region
         self.products = products
-        self.promocodes = {p.code.upper(): p for p in promocodes}
+        self.promocodes = {p.code.upper(): p for p in available_promocodes}
         self._items: Dict[str, ShoppingCartItem] = {}
 
         self.promocode_discount = Decimal("0")
@@ -72,10 +72,9 @@ class ShoppingCart:
 
     @property
     def gross_total(self):
-        return sum([item.total for item in self._items.values()]) 
+        return sum([item.total for item in self._items.values()])
 
-
-    def apply_promocode(self, promo_code: str) -> bool:        
+    def apply_promocode(self, promo_code: str) -> bool:
         upper_promocode = promo_code.upper()
 
         if upper_promocode in self.promocodes:
@@ -85,9 +84,7 @@ class ShoppingCart:
             else:
                 return False
         else:
-            raise Exception("Promo code not found.")    
-                
+            raise Exception("Promo code not found.")
 
     def get_total(self):
         return self.gross_total - self.promocode_discount
-        
