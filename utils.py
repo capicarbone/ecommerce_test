@@ -4,16 +4,21 @@ from products_storage import ProductsStorage
 
 fake_products = [
     (
-        "ps4",
-        "Playstation 4",
-        [("es", "500.00", "0.2"), ("ec", "500.00", None)],
+        "PRODA",
+        "Producto A",
+        [("es", "50.00", "0.1"), ("ec", "60.00", None)],
         [
-            (5, "200", None),
-            (10, "500", None),
-            (15, None, "0.2"),
+            (3, "45", None),       
         ],
     ),
-    ("xbox", "Xbox", [("es", "450", "0.15"), ("ec", "450.00", None)], []),
+    (
+        "PRODB", "Product B", [("es", "450", "0.15"), ("ec", "450.00", None)], 
+        [
+            (10, "5", None),
+            (50, None, "0.1"),
+            (200, None, "0.2"),
+        ]
+    ),
 ]
 
 
