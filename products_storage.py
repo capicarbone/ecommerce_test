@@ -49,6 +49,7 @@ class Product:
 
     def add_discount_by_volume(self, discount: DiscountByVolume) -> None:
         self.discounts_by_volume.append(discount)
+        self.discounts_by_volume.sort(key=lambda x: x.qty_threshold, reverse=True)
 
     def __str__(self) -> str:
         return f"({self.sku}) {self.description}"

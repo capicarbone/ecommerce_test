@@ -12,7 +12,7 @@ fake_products = [
         ],
     ),
     (
-        "PRODB", "Product B", [("es", "450", "0.15"), ("ec", "450.00", None)], 
+        "PRODB", "Product B", [("es", "1.5", None), ("ec", "2", None)], 
         [
             (10, "5", None),
             (50, None, "0.1"),

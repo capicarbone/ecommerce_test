@@ -3,15 +3,6 @@ from typing import Dict, List
 from products_storage import ProductsStorage
 
 
-# class PromoCodeChecker:
-
-#     def __init__(self, promocodes: Dict[str, str]) -> None:
-#         self.available_promocodes = {k.upper(): v for k, v in promocodes.items()}
-
-#     def check_promo_code(self, promo_code: str) -> Decimal:
-#         return Decimal(self.available_promocodes.get(promo_code, "0"))
-
-
 class PromoCode:
     def __init__(self, code: str, discount: Decimal, threshold: Decimal) -> None:
         self.code = code
@@ -28,24 +19,33 @@ class ShoppingCartItem:
         description: str,
         unit_price: Decimal,
         discount=Decimal("0"),
-        volume_discount: Decimal = None,
+        volume_discount = Decimal("0"),
+        percentage_volume_discount = Decimal("0")
+
     ) -> None:
         self.qty = qty
         self.product_sku = sku
         self.product_description = description
         self.product_unit_price = unit_price
         self.discount_multiplier = Decimal("1") - discount
-        self.product_volume_discount = volume_discount
+        self.volume_discount = volume_discount
+        self.volume_discount_multiplier = Decimal("1") - percentage_volume_discount
 
     @property
     def total(self):
-        return self.qty * self.product_unit_price * self.discount_multiplier
+        #import pdb; pdb.set_trace()
+        return (
+            self.qty * self.product_unit_price * self.discount_multiplier * self.volume_discount_multiplier
+        ) - self.volume_discount
 
 
 class ShoppingCart:
 
     def __init__(
-        self, region: str, products: ProductsStorage, available_promocodes: List[PromoCode]
+        self,
+        region: str,
+        products: ProductsStorage,
+        available_promocodes: List[PromoCode],
     ) -> None:
         self.region_code = region
         self.products = products
@@ -60,12 +60,24 @@ class ShoppingCart:
     def add_item(self, sku: str, qty: int):
         product = self.products.get_product(sku)
 
+        unit_price = product.regions[self.region_code].price
+        volume_discount = Decimal("0")
+        percentage_volume_discount = Decimal("0")
+
+        for discount_by_volume in product.discounts_by_volume:
+            if qty >= discount_by_volume.qty_threshold:                
+                percentage_volume_discount = discount_by_volume.percentage_discount or percentage_volume_discount                
+                volume_discount = discount_by_volume.amount_discount or volume_discount
+                break
+
         sci = ShoppingCartItem(
             qty=qty,
             sku=product.sku,
             description=product.description,
-            unit_price=product.regions[self.region_code].price,
+            unit_price=unit_price,
             discount=product.regions[self.region_code].discount or Decimal("0"),
+            volume_discount=volume_discount,
+            percentage_volume_discount=percentage_volume_discount
         )
 
         self._items[sku] = sci
