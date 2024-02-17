@@ -1,7 +1,7 @@
 
 # Prueba de carrito de compras
 
-# Sobre la implementacion
+# Sobre la implementación
 
 Se ha implementado con Python 3.x, sin alguna dependencia fuera de la instacion de Python 3, por lo que no es necesario instalar algún modulo.
 
