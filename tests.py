@@ -174,7 +174,7 @@ class ShoppingCartTestCase(unittest.TestCase):
         sc.add_item('PRODA', 1)
         sc.add_item('PRODB', 1)
 
-        sc.apply_promocode('promo100')
+        self.assertFalse(sc.apply_promocode('promo100'))
 
         self.assertEqual(Decimal("46.5"), sc.get_total())
 
@@ -191,7 +191,7 @@ class ShoppingCartTestCase(unittest.TestCase):
         sc.add_item('PRODA', 3)
         sc.add_item('PRODB', 9)
 
-        sc.apply_promocode('promo100')
+        self.assertFalse(sc.apply_promocode('promo100'))
 
         self.assertEqual(Decimal("103.5"), sc.get_total())
 
@@ -208,7 +208,7 @@ class ShoppingCartTestCase(unittest.TestCase):
         sc.add_item('PRODA', 3)
         sc.add_item('PRODB', 10)
 
-        sc.apply_promocode('promo100')
+        self.assertFalse(sc.apply_promocode('promo100'))
 
         self.assertEqual(Decimal("100"), sc.get_total())
 
@@ -225,7 +225,7 @@ class ShoppingCartTestCase(unittest.TestCase):
         sc.add_item('PRODA', 3)
         sc.add_item('PRODB', 60)
 
-        sc.apply_promocode('promo100')
+        self.assertFalse(sc.apply_promocode('promo100'))
 
         self.assertEqual(Decimal("171"), sc.get_total())
 
@@ -242,7 +242,7 @@ class ShoppingCartTestCase(unittest.TestCase):
         sc.add_item('PRODA', 4)
         sc.add_item('PRODB', 110)
 
-        sc.apply_promocode('promo100')
+        self.assertTrue(sc.apply_promocode('promo100'))
 
         self.assertEqual(Decimal("183.5"), sc.get_total())
 
@@ -259,7 +259,7 @@ class ShoppingCartTestCase(unittest.TestCase):
         sc.add_item('PRODA', 6)
         sc.add_item('PRODB', 200)
 
-        sc.apply_promocode('promo100')
+        self.assertTrue(sc.apply_promocode('promo100'))
 
         self.assertEqual(Decimal("365"), sc.get_total())
 
