@@ -1,13 +1,21 @@
 from decimal import Decimal
 from typing import Dict, List
 from products_storage import ProductsStorage
+from validators import is_valid_amount
 
 
 class PromoCode:
-    def __init__(self, code: str, discount: Decimal, threshold: Decimal) -> None:
+    def __init__(self, code: str, discount: Decimal, limit: Decimal) -> None:
+
+        if not is_valid_amount(discount):
+            raise Exception(f"Invalid amount: {discount}")
+
+        if not is_valid_amount(limit):
+            raise Exception(f"Invalid limit: {limit}")
+
         self.code = code
         self.discount = discount
-        self.threshold = threshold
+        self.limit = limit
 
 
 class ShoppingCartItem:
@@ -19,9 +27,8 @@ class ShoppingCartItem:
         description: str,
         unit_price: Decimal,
         discount=Decimal("0"),
-        volume_discount = Decimal("0"),
-        percentage_volume_discount = Decimal("0")
-
+        volume_discount=Decimal("0"),
+        percentage_volume_discount=Decimal("0"),
     ) -> None:
         self.qty = qty
         self.product_sku = sku
@@ -33,9 +40,11 @@ class ShoppingCartItem:
 
     @property
     def total(self):
-        #import pdb; pdb.set_trace()
         return (
-            self.qty * self.product_unit_price * self.discount_multiplier * self.volume_discount_multiplier
+            self.qty
+            * self.product_unit_price
+            * self.discount_multiplier
+            * self.volume_discount_multiplier
         ) - self.volume_discount
 
 
@@ -58,6 +67,10 @@ class ShoppingCart:
         return len(self._items)
 
     def add_item(self, sku: str, qty: int):
+
+        if qty < 1:
+            raise Exception("Invalid quantity.")
+
         product = self.products.get_product(sku)
 
         unit_price = product.regions[self.region_code].price
@@ -65,8 +78,10 @@ class ShoppingCart:
         percentage_volume_discount = Decimal("0")
 
         for discount_by_volume in product.discounts_by_volume:
-            if qty >= discount_by_volume.qty_threshold:                
-                percentage_volume_discount = discount_by_volume.percentage_discount or percentage_volume_discount                
+            if qty >= discount_by_volume.qty_threshold:
+                percentage_volume_discount = (
+                    discount_by_volume.percentage_discount or percentage_volume_discount
+                )
                 volume_discount = discount_by_volume.amount_discount or volume_discount
                 break
 
@@ -77,7 +92,7 @@ class ShoppingCart:
             unit_price=unit_price,
             discount=product.regions[self.region_code].discount or Decimal("0"),
             volume_discount=volume_discount,
-            percentage_volume_discount=percentage_volume_discount
+            percentage_volume_discount=percentage_volume_discount,
         )
 
         self._items[sku] = sci
@@ -90,7 +105,7 @@ class ShoppingCart:
         upper_promocode = promo_code.upper()
 
         if upper_promocode in self.promocodes:
-            if self.gross_total > self.promocodes[upper_promocode].threshold:
+            if self.gross_total > self.promocodes[upper_promocode].limit:
                 self.promocode_discount = self.promocodes[upper_promocode].discount
                 return True
             else:

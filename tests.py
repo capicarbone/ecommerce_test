@@ -93,9 +93,7 @@ class ShoppingCartTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
         self.products = create_fake_products_storage()
-        self.promocodes = [
-            PromoCode("promo100", Decimal("100"), Decimal("200"))
-        ]
+        self.promocodes = [PromoCode("promo100", Decimal("100"), Decimal("200"))]
 
     def test_add_item(self):
 
@@ -122,13 +120,12 @@ class ShoppingCartTestCase(unittest.TestCase):
         sc.add_item("PRODB", 2)
 
         self.assertEqual(Decimal("124"), sc.get_total())
-        
 
     def test_get_total_with_items_with_discount(self):
 
         sc = ShoppingCart("es", self.products, self.promocodes)
 
-        sc.add_item("PRODA", 2)        
+        sc.add_item("PRODA", 2)
 
         self.assertEqual(Decimal("90"), sc.get_total())
 
@@ -136,7 +133,7 @@ class ShoppingCartTestCase(unittest.TestCase):
 
         sc = ShoppingCart("es", self.products, self.promocodes)
 
-        sc.add_item("PRODA", 2)        
+        sc.add_item("PRODA", 2)
 
         self.assertEqual(Decimal("90"), sc.get_total())
 
@@ -144,11 +141,10 @@ class ShoppingCartTestCase(unittest.TestCase):
 
         sc = ShoppingCart("ec", self.products, self.promocodes)
 
-        sc.add_item("PRODA", 6)        
-        self.assertTrue(sc.apply_promocode('promo100'))
+        sc.add_item("PRODA", 6)
+        self.assertTrue(sc.apply_promocode("promo100"))
 
         self.assertEqual(Decimal("215"), sc.get_total())
-
 
     def test_not_existing_promocode(self):
         sc = ShoppingCart("es", self.products, self.promocodes)
@@ -160,9 +156,7 @@ class ShoppingCartTestCase(unittest.TestCase):
 
         self.assertTrue("Promo code not found" in str(ctx.exception))
 
-
     def test_example_case_1(self):
-
         """
         Para un **carro** con 1 unidad del **producto** A y 1 unidad del
         **producto** B usando el **código promocional** "promo100", el precio
@@ -171,15 +165,14 @@ class ShoppingCartTestCase(unittest.TestCase):
 
         sc = ShoppingCart("es", self.products, self.promocodes)
 
-        sc.add_item('PRODA', 1)
-        sc.add_item('PRODB', 1)
+        sc.add_item("PRODA", 1)
+        sc.add_item("PRODB", 1)
 
-        self.assertFalse(sc.apply_promocode('promo100'))
+        self.assertFalse(sc.apply_promocode("promo100"))
 
         self.assertEqual(Decimal("46.5"), sc.get_total())
 
     def test_example_case_2(self):
-
         """
         Para un **carro** con 3 unidades del **producto** A y 9 unidades del
         **producto** B usando el **código promocional** "promo100", el precio
@@ -188,15 +181,14 @@ class ShoppingCartTestCase(unittest.TestCase):
 
         sc = ShoppingCart("es", self.products, self.promocodes)
 
-        sc.add_item('PRODA', 3)
-        sc.add_item('PRODB', 9)
+        sc.add_item("PRODA", 3)
+        sc.add_item("PRODB", 9)
 
-        self.assertFalse(sc.apply_promocode('promo100'))
+        self.assertFalse(sc.apply_promocode("promo100"))
 
         self.assertEqual(Decimal("103.5"), sc.get_total())
 
     def test_example_case_3(self):
-
         """
         Para un **carro** con 3 unidades del **producto** A y 10 unidades del
         **producto** B usando el **código promocional** "promo100", el precio
@@ -205,15 +197,14 @@ class ShoppingCartTestCase(unittest.TestCase):
 
         sc = ShoppingCart("es", self.products, self.promocodes)
 
-        sc.add_item('PRODA', 3)
-        sc.add_item('PRODB', 10)
+        sc.add_item("PRODA", 3)
+        sc.add_item("PRODB", 10)
 
-        self.assertFalse(sc.apply_promocode('promo100'))
+        self.assertFalse(sc.apply_promocode("promo100"))
 
         self.assertEqual(Decimal("100"), sc.get_total())
 
     def test_example_case_4(self):
-
         """
         Para un **carro** con 3 unidades del **producto** A y 60 unidades del
         **producto** B usando el **código promocional** "promo100", el precio
@@ -222,15 +213,14 @@ class ShoppingCartTestCase(unittest.TestCase):
 
         sc = ShoppingCart("es", self.products, self.promocodes)
 
-        sc.add_item('PRODA', 3)
-        sc.add_item('PRODB', 60)
+        sc.add_item("PRODA", 3)
+        sc.add_item("PRODB", 60)
 
-        self.assertFalse(sc.apply_promocode('promo100'))
+        self.assertFalse(sc.apply_promocode("promo100"))
 
         self.assertEqual(Decimal("171"), sc.get_total())
 
     def test_example_case_5(self):
-
         """
         Para un **carro** con 4 unidades del **producto** A y 110 unidades del
         **producto** B usando el **código promocional** "promo100", el precio
@@ -239,15 +229,14 @@ class ShoppingCartTestCase(unittest.TestCase):
 
         sc = ShoppingCart("es", self.products, self.promocodes)
 
-        sc.add_item('PRODA', 4)
-        sc.add_item('PRODB', 110)
+        sc.add_item("PRODA", 4)
+        sc.add_item("PRODB", 110)
 
-        self.assertTrue(sc.apply_promocode('promo100'))
+        self.assertTrue(sc.apply_promocode("promo100"))
 
         self.assertEqual(Decimal("183.5"), sc.get_total())
 
     def test_example_case_6(self):
-
         """
         Para un **carro** con 6 unidades del **producto** A y 200 unidades del
         **producto** B usando el **código promocional** "promo100", el precio
@@ -256,15 +245,9 @@ class ShoppingCartTestCase(unittest.TestCase):
 
         sc = ShoppingCart("es", self.products, self.promocodes)
 
-        sc.add_item('PRODA', 6)
-        sc.add_item('PRODB', 200)
+        sc.add_item("PRODA", 6)
+        sc.add_item("PRODB", 200)
 
-        self.assertTrue(sc.apply_promocode('promo100'))
+        self.assertTrue(sc.apply_promocode("promo100"))
 
         self.assertEqual(Decimal("365"), sc.get_total())
-
-
-    
-
-        
-

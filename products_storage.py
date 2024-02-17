@@ -1,18 +1,28 @@
 from decimal import Decimal
 from typing import Dict, List
 
+from validators import is_valid_amount, is_valid_percentage
+
 
 class DiscountByVolume:
 
     def __init__(
         self, qty_threshold: int, percentage_discount: Decimal, amount_discount: Decimal
     ) -> None:
-        
+
         if not percentage_discount and not amount_discount:
-            raise Exception("Either percentage_discount or amount_discount are required.")
-        
+            raise Exception(
+                "Either percentage_discount or amount_discount is required."
+            )
+
         if qty_threshold < 1:
             raise Exception("Invalid threshold")
+
+        if percentage_discount and not is_valid_percentage(percentage_discount):
+            raise Exception("Invalid percentage.")
+
+        if amount_discount and not is_valid_amount(amount_discount):
+            raise Exception("Invalid amount")
 
         self.qty_threshold = qty_threshold
         self.percentage_discount = percentage_discount
@@ -72,6 +82,12 @@ class ProductsStorage:
     ):
         product = self._products[sku]
 
+        if not is_valid_amount(price):
+            raise Exception(f"Invalid price: {price}")
+
+        if discount and not is_valid_percentage(discount):
+            raise Exception(f"Invalid discount: {discount}")
+
         product.add_region(ProductRegion(region_code, price, discount))
 
     def add_discount_by_volume_to_product(
@@ -80,7 +96,7 @@ class ProductsStorage:
         threshold: int,
         amount_discount: Decimal = None,
         percentage_discount: Decimal = None,
-    ):        
+    ):
         product = self._products[sku]
         product.add_discount_by_volume(
             DiscountByVolume(
