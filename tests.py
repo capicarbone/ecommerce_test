@@ -1,7 +1,6 @@
 from decimal import Decimal
 import unittest
 
-from products_storage import ProductsStorage
 from shopping_cart import PromoCode, ShoppingCart, ShoppingCartItem
 from utils import create_fake_products_storage
 
